@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --max-content: 980px;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  color: theme(colors.ink);
+  background: theme(colors.paper);
+}
+
+@media print {
+  @page {
+    margin: 18mm;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: #111827;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area *,
+  .print-area ~ section,
+  .print-area ~ section * {
+    visibility: visible;
+  }
+
+  .print-area,
+  .print-area ~ section {
+    position: static;
+  }
+
+  .print-area input {
+    background: transparent !important;
+    border: 0 !important;
+    padding-left: 0 !important;
+    color: #111827 !important;
+    font-size: 22pt !important;
+  }
+
+  .print-force-open {
+    display: block !important;
+  }
+
+  button {
+    color: inherit !important;
+    background: transparent !important;
+  }
+
+  h3,
+  figure,
+  table,
+  tr,
+  .print-force-open,
+  .rounded-lg {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th,
+  td {
+    border-color: #d1d5db !important;
+  }
+
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .print-area {
+    margin-top: 0 !important;
+  }
+}

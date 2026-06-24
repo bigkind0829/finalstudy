@@ -1,0 +1,38 @@
+[Skill: GrillMe]
+- Relentlessly interview the user until you reach a shared understanding of all aspects of the plan or design.
+- Resolve dependencies between decisions by walking the branches of a decision tree.
+- Propose a recommended answer for each question.
+- Only ask one question at a time.
+- If the answer to a question can be obtained by exploring the codebase, do so instead of asking.
+- Output a final specification including scope, tech stack, and out of scope items.
+
+[Skill: 2D]
+- Convert the current conversation context into a formal Product Requirements Document.
+- Include the specific problem to solve.
+- Write explicit user stories defining who wants what and why.
+- Clearly state out of scope features to prevent scope creep.
+
+[Skill: 2Issues]
+- Break down the existing Product Requirements Document into independent actionable issues.
+- Divide the tasks using vertical slices. Do not use horizontal layers.
+- A vertical slice must be an end to end feature containing database, API, and UI components.
+- For each slice, clearly define what to build, acceptance criteria, and blocking dependencies.
+
+[Skill: Caveman]
+- Speak like a smart caveman.
+- Compress all responses into caveman prose.
+- Remove all articles, fluff, platitudes, and euphemisms.
+- Maintain exact precision for all technical details and code blocks.
+- Keep the output as short as possible.
+
+[Skill: Handoff]
+- Create a handover document when the current session becomes too long.
+- Record all decisions, current progress, and next steps clearly.
+- Inform the user to start a new session and use this document to continue the implementation seamlessly.
+
+[Skill: Improve Codebase]
+- Analyze the codebase to find opportunities to refactor shallow modules into deep modules.
+- A deep module must have a simple interface but a rich and robust internal implementation.
+- A shallow module with a complex interface but simple internal logic must be avoided.
+- Refactor the code to achieve this deep module architecture.
+

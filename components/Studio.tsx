@@ -6,6 +6,7 @@ import {
   generateNoteFromAudio,
   generateNoteFromTranscript,
 } from "@/lib/note-api";
+import { estimateChunkCount, shouldChunkText } from "@/lib/text-chunks";
 import { useNoteLibrary } from "@/hooks/useNoteLibrary";
 import NoteHeader from "@/components/NoteHeader";
 import NoteLibrary from "@/components/NoteLibrary";
@@ -22,6 +23,7 @@ export default function Studio() {
   const library = useNoteLibrary();
 
   const loading = phase !== null;
+  const transcriptChunkCount = estimateChunkCount(transcript);
 
   function remove(id: string) {
     if (!confirm("이 노트 삭제?")) return;
@@ -39,7 +41,11 @@ export default function Studio() {
 
   async function generateFromText() {
     setError(null);
-    setPhase("구조화 중...");
+    setPhase(
+      shouldChunkText(transcript)
+        ? `긴 대본 ${transcriptChunkCount}개 조각으로 정리 중...`
+        : "구조화 중..."
+    );
     try {
       await library.save(await generateNoteFromTranscript(transcript));
       setTranscript("");
@@ -134,7 +140,7 @@ export default function Studio() {
             <textarea
               value={transcript}
               onChange={(e) => setTranscript(e.target.value)}
-              placeholder="강의 대본 텍스트를 여기에 붙여넣어라..."
+              placeholder="강의 대본 텍스트를 여기에 붙여넣어라. 긴 대본은 자동 분할해서 정리."
               className="h-48 w-full resize-y rounded-md border border-line p-3 text-sm outline-none focus:border-ink"
             />
             <div className="mt-3 flex items-center gap-3">
@@ -148,6 +154,9 @@ export default function Studio() {
               </button>
               <span className="text-xs text-subtle">
                 {transcript.trim().length}자
+                {shouldChunkText(transcript)
+                  ? ` · ${transcriptChunkCount}개 조각 자동 분할`
+                  : ""}
               </span>
             </div>
           </section>

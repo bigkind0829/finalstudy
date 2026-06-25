@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Note } from "@/lib/note";
 
 export default function NoteHeader({
@@ -15,6 +15,11 @@ export default function NoteHeader({
   saving?: boolean;
 }) {
   const [draft, setDraft] = useState(note.title);
+  const onRenameRef = useRef(onRename);
+
+  useEffect(() => {
+    onRenameRef.current = onRename;
+  }, [onRename]);
 
   useEffect(() => {
     setDraft(note.title);
@@ -23,9 +28,9 @@ export default function NoteHeader({
   useEffect(() => {
     const title = draft.trim();
     if (!title || title === note.title) return;
-    const timer = window.setTimeout(() => onRename(title), 600);
+    const timer = window.setTimeout(() => onRenameRef.current(title), 600);
     return () => window.clearTimeout(timer);
-  }, [draft, note.title, onRename]);
+  }, [draft, note.title]);
 
   function printPdf() {
     window.setTimeout(() => window.print(), 100);
@@ -42,7 +47,7 @@ export default function NoteHeader({
           onChange={(e) => setDraft(e.target.value)}
           onBlur={() => {
             const title = draft.trim();
-            if (title && title !== note.title) onRename(title);
+            if (title && title !== note.title) onRenameRef.current(title);
           }}
           className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-2xl font-semibold tracking-tight outline-none hover:bg-gray-50 focus:border-ink focus:bg-white"
           placeholder="제목 입력 (클릭해 수정)"

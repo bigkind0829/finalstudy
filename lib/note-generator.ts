@@ -4,8 +4,10 @@ import {
   createUserContent,
 } from "@google/genai";
 import { generateContentWithFallback } from "@/lib/gemini";
+import { summarizeLongTranscript } from "@/lib/long-transcript";
 import { NoteDraftSchema, type Note } from "@/lib/note";
 import { SYSTEM_PROMPT } from "@/lib/prompt";
+import { shouldChunkText } from "@/lib/text-chunks";
 
 const AUDIO_INSTRUCTION =
   "이 강의 오디오를 듣고 규칙대로 구조화 노트 JSON 을 만들어라.";
@@ -95,6 +97,12 @@ export function createNoteGenerator(apiKey: string) {
 
   return {
     async fromTranscript(transcript: string, sourceFileName: string) {
+      if (shouldChunkText(transcript)) {
+        const { mergedInput } = await summarizeLongTranscript(ai, transcript);
+        const raw = await generateRaw(ai, mergedInput);
+        return toNote(parseDraft(raw), sourceFileName);
+      }
+
       const raw = await generateRaw(ai, transcript);
       return toNote(parseDraft(raw), sourceFileName);
     },

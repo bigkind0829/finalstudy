@@ -137,7 +137,8 @@ create table notes (
 
 **API**
 - `POST /api/generate`
-- `POST /api/note-from-audio`
+- `POST /api/audio-upload-url`
+- `POST /api/note-from-storage`
 - 두 API 모두 `requireOwner()` 적용.
 
 **UI**

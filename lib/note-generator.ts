@@ -71,29 +71,34 @@ async function waitForFileReady(ai: GoogleGenAI, name: string) {
 export function createNoteGenerator(apiKey: string) {
   const ai = new GoogleGenAI({ apiKey });
 
+  async function fromAudioBlob(
+    blob: Blob,
+    sourceFileName: string,
+    mimeType = "audio/mpeg"
+  ) {
+    const uploaded = await ai.files.upload({
+      file: blob,
+      config: { mimeType },
+    });
+
+    const ready = await waitForFileReady(ai, uploaded.name as string);
+    const raw = await generateRaw(
+      ai,
+      createUserContent([
+        createPartFromUri(ready.uri as string, ready.mimeType as string),
+        AUDIO_INSTRUCTION,
+      ])
+    );
+
+    return toNote(parseDraft(raw), sourceFileName);
+  }
+
   return {
     async fromTranscript(transcript: string, sourceFileName: string) {
       const raw = await generateRaw(ai, transcript);
       return toNote(parseDraft(raw), sourceFileName);
     },
 
-    async fromAudio(file: File) {
-      const mimeType = file.type || "audio/mpeg";
-      const uploaded = await ai.files.upload({
-        file: new Blob([await file.arrayBuffer()], { type: mimeType }),
-        config: { mimeType },
-      });
-
-      const ready = await waitForFileReady(ai, uploaded.name as string);
-      const raw = await generateRaw(
-        ai,
-        createUserContent([
-          createPartFromUri(ready.uri as string, ready.mimeType as string),
-          AUDIO_INSTRUCTION,
-        ])
-      );
-
-      return toNote(parseDraft(raw), file.name);
-    },
+    fromAudioBlob,
   };
 }

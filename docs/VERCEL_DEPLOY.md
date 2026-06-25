@@ -19,6 +19,9 @@ APP_PASSWORD=...
 SESSION_SECRET=...
 SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+SUPABASE_AUDIO_BUCKET=lecture-assets
 ```
 
 `SESSION_SECRET` should be long and random.
@@ -51,6 +54,9 @@ Test:
    - `SESSION_SECRET`
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `SUPABASE_AUDIO_BUCKET`
 5. Deploy.
 
 ## 5. Production Smoke Test
@@ -67,6 +73,7 @@ Use the deployed URL:
 
 ## Known Limit
 
-Large audio upload on Vercel Hobby may fail due to request/function limits.
-This app is prepared for personal deployment, but long-audio production support
-should use temporary Supabase Storage + chunking later.
+Audio uploads now go through private Supabase Storage, so Vercel request body
+limits are avoided. Very long audio can still fail because the serverless
+processing function has an execution time limit. Longer production-grade audio
+support should add chunking and a background job queue later.

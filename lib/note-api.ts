@@ -1,5 +1,6 @@
 "use client";
 
+import { createSupabaseBrowser } from "@/lib/supabase-browser";
 import type { Note } from "@/lib/note";
 
 async function readJsonOrError(res: Response) {
@@ -42,11 +43,37 @@ export async function generateNoteFromTranscript(transcript: string) {
 }
 
 export async function generateNoteFromAudio(file: File) {
-  const form = new FormData();
-  form.append("audio", file);
-  const res = await fetch("/api/note-from-audio", {
+  const uploadUrlRes = await fetch("/api/audio-upload-url", {
     method: "POST",
-    body: form,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fileName: file.name,
+      mimeType: file.type || "audio/mpeg",
+      size: file.size,
+    }),
+  });
+  const uploadInfo = await readJsonOrError(uploadUrlRes);
+  if (!uploadUrlRes.ok) {
+    throw new Error(uploadInfo.error ?? "업로드 URL 생성 실패.");
+  }
+
+  const supabase = createSupabaseBrowser();
+  const { error: uploadError } = await supabase.storage
+    .from(uploadInfo.bucket)
+    .uploadToSignedUrl(uploadInfo.path, uploadInfo.token, file);
+
+  if (uploadError) {
+    throw new Error("오디오 업로드 실패: " + uploadError.message);
+  }
+
+  const res = await fetch("/api/note-from-storage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      path: uploadInfo.path,
+      fileName: file.name,
+      mimeType: file.type || "audio/mpeg",
+    }),
   });
   return readNoteResponse(res);
 }

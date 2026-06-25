@@ -30,3 +30,8 @@ create index if not exists lecture_assets_note_idx
 
 create index if not exists lecture_assets_owner_idx
   on lecture_assets(owner_id);
+
+-- Private bucket for temporary uploads and future lecture assets.
+insert into storage.buckets (id, name, public)
+values ('lecture-assets', 'lecture-assets', false)
+on conflict (id) do nothing;

@@ -11,12 +11,17 @@ Required values:
 - `SESSION_SECRET`
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_AUDIO_BUCKET`
 
 Notes:
 
 - `APP_PASSWORD` is the single password for the personal app.
 - `SESSION_SECRET` should be a long random string.
 - `SUPABASE_SERVICE_ROLE_KEY` is server-only. Never expose it in client components.
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is safe to expose and is used for signed Storage uploads.
+- `SUPABASE_AUDIO_BUCKET` defaults to `lecture-assets`.
 
 ## Supabase Setup
 
@@ -63,28 +68,30 @@ create table lecture_assets (
    - `SESSION_SECRET`
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `SUPABASE_AUDIO_BUCKET`
 4. Deploy.
 
 ## Vercel Hobby Limits
 
-The current app sends audio files directly to a Next.js API route.
+The current app uploads audio directly to private Supabase Storage with a signed
+upload URL, then the server processes the stored temporary file.
 
-This is fine for local development, but Vercel Hobby has request body and
-function execution limits. Large audio files can fail. The deployed direct
-upload path currently uses a conservative 4MB app limit.
+This avoids Vercel request body limits for uploads, but Vercel function
+execution time can still limit very long audio processing.
 
 For the first deployed personal version:
 
 - Text input should work reliably.
-- Small audio files should work.
-- Long lecture audio may fail on Vercel Hobby.
+- Audio files up to 50MB can upload through Supabase Storage.
+- Very long audio may still fail during processing on Vercel Hobby.
 
-Future stable long-audio support needs a different upload path:
+Future stable long-audio support beyond this needs:
 
-1. Browser uploads audio to temporary Supabase Storage.
-2. Server processes the stored file.
-3. Server deletes the temporary file after note generation.
-4. For very long lectures, add chunking/job queue.
+1. Chunking.
+2. Background job queue.
+3. Progress tracking.
 
 ## Smoke Test
 

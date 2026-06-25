@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireOwner } from "@/lib/auth";
+import { getOwnerOrUnauthorized, jsonError } from "@/lib/api-helpers";
 import { getGeminiKey } from "@/lib/env";
 import { createNoteGenerator } from "@/lib/note-generator";
 import { createNote } from "@/lib/note-store";
@@ -8,12 +8,8 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
-  let ownerId: string;
-  try {
-    ownerId = requireOwner();
-  } catch {
-    return NextResponse.json({ error: "인증 필요." }, { status: 401 });
-  }
+  const auth = getOwnerOrUnauthorized();
+  if (auth.response) return auth.response;
 
   let transcript: string;
   let sourceFileName: string;
@@ -42,12 +38,9 @@ export async function POST(req: NextRequest) {
       transcript,
       sourceFileName
     );
-    const note = await createNote(ownerId, generated);
+    const note = await createNote(auth.ownerId, generated);
     return NextResponse.json({ note });
   } catch (e) {
-    return NextResponse.json(
-      { error: "노트 생성/저장 실패: " + (e as Error).message },
-      { status: 502 }
-    );
+    return jsonError("노트 생성/저장 실패: " + (e as Error).message, 502);
   }
 }

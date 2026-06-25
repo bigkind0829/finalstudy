@@ -41,13 +41,13 @@
 
 ## Slice 2 — 오디오 업로드 → STT → 노트 생성 (입력 소스 완성)
 **무엇을 만드나**
-- UI: 오디오 파일 선택(mp3/m4a/wav), ≤4MB 클라이언트 검증, 진행 상태 표시.
-- API: `POST /api/note-from-audio` — 파일 → Gemini 오디오 입력 → Slice 1 구조화 파이프라인 연결.
+- UI: 오디오 파일 선택(mp3/m4a/wav), ≤50MB 클라이언트 검증, 진행 상태 표시.
+- API: `POST /api/audio-upload-url` → Supabase Storage 직접 업로드 → `POST /api/note-from-storage` → Gemini 오디오 입력 → Slice 1 구조화 파이프라인 연결.
 - 에러: 용량 초과/형식 오류/STT 실패 처리.
 
 **완료 기준 (AC)**
-- 짧은 오디오(≤4MB) 업로드 시 노트가 생성된다.
-- 4MB 초과 파일은 업로드 전 거절되고 안내가 뜬다.
+- 오디오(≤50MB) 업로드 시 노트가 생성된다.
+- 50MB 초과 파일은 업로드 전 거절되고 안내가 뜬다.
 - 처리 중 진행 상태(전사 중/구조화 중)가 보인다.
 
 **의존성**: Slice 1

@@ -1,6 +1,5 @@
-// Vercel direct API upload has a small request body limit.
-// Longer audio needs the future Supabase Storage + chunking flow.
-export const MAX_AUDIO_MB = 4;
+// Browser uploads audio directly to Supabase Storage, then server processes it.
+export const MAX_AUDIO_MB = 50;
 export const MAX_AUDIO_BYTES = MAX_AUDIO_MB * 1024 * 1024;
 
 export const ALLOWED_AUDIO_TYPES = [

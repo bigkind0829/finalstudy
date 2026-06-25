@@ -1,5 +1,6 @@
-// 오디오 입력 제약. 안정성을 위해 MVP는 50MB까지 허용.
-export const MAX_AUDIO_MB = 50;
+// Vercel direct API upload has a small request body limit.
+// Longer audio needs the future Supabase Storage + chunking flow.
+export const MAX_AUDIO_MB = 4;
 export const MAX_AUDIO_BYTES = MAX_AUDIO_MB * 1024 * 1024;
 
 export const ALLOWED_AUDIO_TYPES = [

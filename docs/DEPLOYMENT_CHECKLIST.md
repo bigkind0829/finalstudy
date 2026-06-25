@@ -70,8 +70,8 @@ create table lecture_assets (
 The current app sends audio files directly to a Next.js API route.
 
 This is fine for local development, but Vercel Hobby has request body and
-function execution limits. Large audio files can fail even if the app allows
-up to 50MB locally.
+function execution limits. Large audio files can fail. The deployed direct
+upload path currently uses a conservative 4MB app limit.
 
 For the first deployed personal version:
 

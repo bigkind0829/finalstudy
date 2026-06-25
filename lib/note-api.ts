@@ -2,8 +2,22 @@
 
 import type { Note } from "@/lib/note";
 
+async function readJsonOrError(res: Response) {
+  const text = await res.text();
+  try {
+    return text ? JSON.parse(text) : {};
+  } catch {
+    if (res.status === 413 || text.includes("Request Entity")) {
+      throw new Error(
+        "오디오 파일이 배포 서버 업로드 한도를 초과함. 더 짧게 자르거나 압축 필요."
+      );
+    }
+    throw new Error(text || `요청 실패 (${res.status})`);
+  }
+}
+
 async function readNoteResponse(res: Response): Promise<Note> {
-  const data = await res.json();
+  const data = await readJsonOrError(res);
   if (!res.ok) {
     throw new Error(data.error ?? "생성 실패.");
   }
@@ -11,7 +25,7 @@ async function readNoteResponse(res: Response): Promise<Note> {
 }
 
 async function readNotesResponse(res: Response): Promise<Note[]> {
-  const data = await res.json();
+  const data = await readJsonOrError(res);
   if (!res.ok) {
     throw new Error(data.error ?? "노트 목록 조회 실패.");
   }
@@ -52,7 +66,7 @@ export async function renameRemoteNote(id: string, title: string) {
 
 export async function deleteRemoteNote(id: string) {
   const res = await fetch(`/api/notes/${id}`, { method: "DELETE" });
-  const data = await res.json();
+  const data = await readJsonOrError(res);
   if (!res.ok) {
     throw new Error(data.error ?? "노트 삭제 실패.");
   }
